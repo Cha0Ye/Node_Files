@@ -31,13 +31,7 @@ async function webCat(path){
     //axios.get(path).then(function (data) {}).catch()
 }
 
-
-
-//webCat("...").then()
-
-
-
-if (path.includes("http://")){
+if (path.startsWith("http://")){
     webCat(path);
 }
 else {
