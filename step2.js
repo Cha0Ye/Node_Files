@@ -1,8 +1,9 @@
 //import file read
 const fs = require('fs');
+const process = require('process');
 const axios = require('axios')
 
-let path = process.argv[2];
+
 
 
 
@@ -23,13 +24,16 @@ async function webCat(path){
         let resp = await axios.get(path);
         console.log(resp.data);
         //data === "<html..."
-    } catch {
-        console.log("ERROR, please check URL!")
+    } catch (err) {
+        console.error(`Error fetching ${path}: ${err}`);
+        process.exit(1);
     }
 
     //OR we can use this way
     //axios.get(path).then(function (data) {}).catch()
 }
+
+let path = process.argv[2];
 
 if (path.startsWith("http://")){
     webCat(path);

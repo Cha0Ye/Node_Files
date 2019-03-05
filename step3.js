@@ -1,56 +1,66 @@
 //import file read
 const fs = require('fs');
-
+const process = require('process');
 const axios = require('axios')
 
-let path = process.argv[2];
-
-
-
-async function cat(path){
+function cat(path, out){
     fs.readFile(path,'utf8', function(err, data){
         if(err){
             console.error(err);
             process.exit(1);
         }
-        console.log(`file contents: ${data}`);
-        return data;
+        else{
+            handleOutput(data, out);
+        }
+        //console.log(`file contents: ${data}`);
     });
 }
 
-function write(fileToWriteTo,data){
-    fs.writeFile(`./${fileToWriteTo}`, data, function(){console.log('Success!')});
+function handleOutput(text, out){
+    if(out){
+        fs.writeFile(out, text, 'utf8', function(err, data){
+            if(err){
+                console.error(`Couldn't write ${out}: ${err}`);
+                process.exit(1);
+            }
+        });
+    }
+    else{
+        console.log(text);
+    }
+    
 }
 
 
-async function webCat(path){
-
+async function webCat(path, out){
     try {
         let resp = await axios.get(path);
-        console.log(resp.data);
+        console.log(resp.data, out);
+        handleOutput(resp.data, out);
         //data === "<html..."
-    } catch {
-        console.log("ERROR, please check URL!")
+    } catch (err) {
+        console.error(`Error fetching ${path}: ${err}`);
+        process.exit(1);
     }
 
     //OR we can use this way
     //axios.get(path).then(function (data) {}).catch()
 }
 
-if (path.startsWith("http://")){
-    webCat(path);
+let path;
+let out;
+
+if(process.argv[2] === '--out'){
+    out = process.argv[3];
+    path = process.argv[4];
 }
-else if(path === '--out'){
-//     let writeToFile = process.argv[3];
-//     let writeFromFile = process.argv[4];
-//     console.log(writeFromFile)
-//     let data = cat(writeFromFile); 
-//     console.log(data)
-//     write(writeToFile,data);
-    let d = Promise.resolve(cat(process.argv[4]))//.then(msg=>{return msg});
-    console.log(`this is ${d}`);
+else{
+    path= process.argv[2];
 }
 
+if (path.startsWith("http://")){
+    webCat(path, out);
+}
 else {
-    cat(path);
+    cat(path, out);
 }

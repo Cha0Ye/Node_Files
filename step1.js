@@ -1,9 +1,6 @@
 //import file read
 const fs = require('fs');
-
-let path = process.argv[2];
-
-
+const process = require('process');
 
 function cat(path){
     fs.readFile(path,'utf8', function(err, data){
@@ -16,7 +13,7 @@ function cat(path){
 }
 
 
-cat(path);
+cat(process.argv[2]);
 
 
 /*-------------------------------------------------------*/
